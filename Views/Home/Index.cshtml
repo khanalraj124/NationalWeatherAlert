@@ -1,0 +1,28 @@
+﻿@model NationalWeatherAlert.Models.RegionwithAbb
+@{
+    ViewData["Title"] = "Home Page";
+}
+@{
+    <form asp-controller="Home" asp-action="Weather" method="post" class="form-horizontal" role="form">
+        <div class="form-group">
+            <div class="row">
+                <div class="alert-danger" asp-validation-summary="ModelOnly"></div>
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <label class="control-label">Region List</label>
+                    <select asp-items="@ViewBag.RegionList" asp-for="RegionId">
+                        <option selected disabled>--Select--</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+                    <input id="Submit1" type="submit" value="Alerts" />
+                </div>
+            </div>
+        </div>
+      
+    </form>
+}

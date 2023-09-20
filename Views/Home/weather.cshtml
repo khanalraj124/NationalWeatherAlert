@@ -1,0 +1,106 @@
+﻿@model NationalWeatherAlert.Models.States
+@{
+    ViewData["Title"] = "Weather";
+}
+@section scripts
+    {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var a = 0;
+            $("#tblMain").hide();
+        });
+        function loadCity(obj) {
+            var value = obj.value;
+            var base_url = window.location.origin;
+            var url = base_url;
+            $.post(url + "/Home/GetzoneByState", { stateAbbr: value }, function (data) {
+                PopulateDropDown("#ddlCity", data);
+            });
+        }
+        function PopulateDropDown(dropDownId, list, selectedId) {
+            $("#displayError").empty();
+            $(dropDownId).empty();
+            $(dropDownId).append("<option>--Select--</option>")
+            var city = [];
+            $.each(list, function (index, row) {
+                if (city.indexOf(row.city) === -1) {
+                    city.push(row.city);
+                }
+            });
+            $.each(city, function (index, row) {
+                var filteredList = list;
+                $(dropDownId).append("<optgroup label='" + city[index] + "' >")
+                filteredList = filteredList.filter(x => x.city === city[index]);
+                console.log(filteredList);
+                $.each(filteredList, function (index, row) {
+                    $(dropDownId).append("<option value='" + row.zone + "'>" + row.zone + "-" + row.zoneName + "</option>")
+                });
+                $(dropDownId).append("</optgroup>")
+            });
+
+        }
+        function loadWeather(obj) {
+            $("#displayError").empty();
+            $("#tblMain").hide();
+            var value = obj.value;
+            alert("wait for the result from api -- api.weather.gov");
+            var url = 'https://api.weather.gov/alerts/active/zone/';
+            $.get(url + value, function (data) {
+                if (data.features.length > 0) {
+                    console.log(data);
+                    $("#tblMain").show();
+                    $("#displayArea").html("Alerts")
+                    $("#displayArea").html("<tr><td>" + data.features[0].properties.event + "</td><td>"
+                        + data.features[0].properties.severity
+                        + "</td><td>" + data.features[0].properties.headline
+                        + "</td><td>" + data.features[0].properties.description);
+                } else {
+
+                    $("#displayError").html("No data in features so printing title <br/>" + data.title);
+                }
+            });
+        }
+    </script>
+}
+<div class="form-group">
+    <div class="row">
+
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+            <label class="control-label">State List</label>
+            <select asp-items="@ViewBag.states" asp-for="Abbreviation" onchange="loadCity(this)">
+                <option selected disabled>--Select--</option>
+            </select>
+        </div>
+    </div>
+
+</div>
+<br />
+<div class="form-group">
+    <div class="row">
+
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+            <label class="control-label">City</label>
+            <select class="form-control" id="ddlCity" onchange="loadWeather(this)"></select>
+        </div>
+    </div>
+</div>
+<br />
+<br />
+<div style="color:red" id="displayError"></div>
+<div class="form-group">
+    <div class="row">
+        <table border="1" id="tblMain">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Severity</th>
+                    <th>Headline</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="displayArea"></tbody>
+        </table>
+    </div>
+</div>
+
+
